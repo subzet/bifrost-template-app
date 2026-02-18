@@ -28,7 +28,7 @@ docker-run:
 docker: docker-build docker-run
 
 ATLAS := atlas
-LOCAL_DB := file:./data/app.db?_fk=1
+LOCAL_DB := sqlite://dev.db
 PROD_DB  := libsql://$$TURSO_DB_URL?authToken=$$TURSO_AUTH_TOKEN
 
 .PHONY: migrations-generate
@@ -65,5 +65,5 @@ inspect-models:
 # Optional: quick reset local DB
 .PHONY: dev-reset
 dev-reset:
-	rm -f ./data/dev.db
+	rm -f dev.db
 	make migrations-apply-local
