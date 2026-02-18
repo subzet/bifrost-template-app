@@ -15,6 +15,8 @@ import (
 
 var (
 	ErrEmailTaken         = errors.New("email already taken")
+	ErrHandleTaken        = errors.New("handle already taken")
+	ErrHandleInvalid      = errors.New("handle invalid")
 	ErrInvalidCredentials = errors.New("invalid credentials")
 )
 
@@ -26,15 +28,27 @@ func NewAuthService(repo *model.UserRepository) *AuthService {
 	return &AuthService{repo: repo}
 }
 
-func (s *AuthService) Signup(ctx context.Context, email, password string) (string, error) {
+func (s *AuthService) Signup(ctx context.Context, email, password, handle string) (string, error) {
+	if !model.HandleRegex.MatchString(handle) {
+		return "", ErrHandleInvalid
+	}
+
+	if exists, _ := s.repo.ExistsByEmail(ctx, email); exists {
+		return "", ErrEmailTaken
+	}
+
+	if _, err := s.repo.GetByHandle(ctx, handle); err == nil {
+		return "", ErrHandleTaken
+	}
+
 	hash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {
 		return "", err
 	}
 
-	user := &model.User{Email: email, PasswordHash: string(hash)}
+	user := &model.User{Email: email, PasswordHash: string(hash), Name: handle}
 	if err := s.repo.Create(ctx, user); err != nil {
-		return "", ErrEmailTaken
+		return "", err
 	}
 
 	return signToken(user.ID)

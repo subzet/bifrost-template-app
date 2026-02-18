@@ -3,7 +3,7 @@ import { ThemeScript } from "./theme-script";
 import { t } from "./i18n";
 
 interface SignupProps {
-  user?: { email: string };
+  user?: { email: string; handle: string };
   error?: string;
   locale: string;
   t: Record<string, string>;
@@ -35,6 +35,21 @@ export default function Signup({ user, error, locale, t: translations }: SignupP
           )}
 
           <form method="POST" action="/api/signup" className="mt-6 space-y-4">
+            <div className="space-y-1.5">
+              <label htmlFor="handle" className="text-sm font-medium">
+                {t(translations, "signup.handle")}
+              </label>
+              <input
+                id="handle"
+                type="text"
+                name="handle"
+                placeholder="yourhandle"
+                className="flex h-9 w-full rounded-lg border border-input bg-transparent px-2.5 py-1 text-sm placeholder:text-muted-foreground focus-visible:border-ring focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/20"
+                required
+                pattern="[a-z0-9][a-z0-9_\-]{2,29}"
+              />
+            </div>
+
             <div className="space-y-1.5">
               <label htmlFor="email" className="text-sm font-medium">
                 {t(translations, "signup.email")}

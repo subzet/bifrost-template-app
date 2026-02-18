@@ -9,3 +9,4 @@ tmp/
 *.db-shm
 *.db-wal
 db/migrations/*.sql
+uploads/*

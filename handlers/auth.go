@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"myapp/i18n"
+	"myapp/model"
 	"myapp/services"
 )
 
@@ -24,9 +25,18 @@ func (h *AuthHandler) Signup() http.HandlerFunc {
 		email := strings.TrimSpace(r.FormValue("email"))
 		password := r.FormValue("password")
 		confirmPassword := r.FormValue("confirm_password")
+		handle := strings.TrimSpace(r.FormValue("handle"))
 
 		if email == "" || password == "" {
 			http.Redirect(w, r, "/signup?error="+url.QueryEscape(i18n.T(locale, "error.emailPasswordRequired")), http.StatusSeeOther)
+			return
+		}
+		if handle == "" {
+			http.Redirect(w, r, "/signup?error="+url.QueryEscape(i18n.T(locale, "error.handleRequired")), http.StatusSeeOther)
+			return
+		}
+		if !model.HandleRegex.MatchString(handle) {
+			http.Redirect(w, r, "/signup?error="+url.QueryEscape(i18n.T(locale, "error.handleInvalid")), http.StatusSeeOther)
 			return
 		}
 		if password != confirmPassword {
@@ -38,18 +48,20 @@ func (h *AuthHandler) Signup() http.HandlerFunc {
 			return
 		}
 
-		token, err := h.svc.Signup(r.Context(), email, password)
+		token, err := h.svc.Signup(r.Context(), email, password, handle)
 		if err != nil {
 			errKey := "error.somethingWrong"
 			if errors.Is(err, services.ErrEmailTaken) {
 				errKey = "error.emailTaken"
+			} else if errors.Is(err, services.ErrHandleTaken) {
+				errKey = "error.handleTaken"
 			}
 			http.Redirect(w, r, "/signup?error="+url.QueryEscape(i18n.T(locale, errKey)), http.StatusSeeOther)
 			return
 		}
 
 		setSessionCookie(w, token)
-		http.Redirect(w, r, "/", http.StatusSeeOther)
+		http.Redirect(w, r, "/user/"+handle+"/edit", http.StatusSeeOther)
 	}
 }
 

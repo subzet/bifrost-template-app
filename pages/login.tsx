@@ -3,7 +3,7 @@ import { ThemeScript } from "./theme-script";
 import { t } from "./i18n";
 
 interface LoginProps {
-  user?: { email: string };
+  user?: { email: string; handle: string };
   error?: string;
   locale: string;
   t: Record<string, string>;

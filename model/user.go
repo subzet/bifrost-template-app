@@ -5,15 +5,30 @@ import (
 	"errors"
 	"fmt"
 	"myapp/util"
+	"regexp"
 
 	"gorm.io/gorm"
 )
 
+var HandleRegex = regexp.MustCompile(`^[a-z0-9][a-z0-9_-]{2,29}$`)
+
+type SocialLinks struct {
+	Instagram string `json:"instagram"`
+	Facebook  string `json:"facebook"`
+	Linkedin  string `json:"linkedin"`
+	X         string `json:"x"`
+}
+
 type User struct {
 	util.Entity
-	Email        string `json:"email" gorm:"uniqueIndex;not null"`
-	PasswordHash string `json:"-" gorm:"column:password_hash;not null"`
-	Name         string `json:"name"`
+	Email        string      `json:"email"        gorm:"uniqueIndex;not null"`
+	PasswordHash string      `json:"-"            gorm:"column:password_hash;not null"`
+	Name         string      `json:"name"`
+	DisplayName  string      `json:"display_name"`
+	Bio          string      `json:"bio"`
+	Country      string      `json:"country"`
+	SocialLinks  SocialLinks `json:"social_links" gorm:"serializer:json"`
+	AvatarURL    string      `json:"avatar_url"`
 }
 
 type UserRepository struct {
@@ -56,6 +71,22 @@ func (r *UserRepository) GetByEmail(ctx context.Context, email string) (*User, e
 			return nil, fmt.Errorf("user not found")
 		}
 		return nil, fmt.Errorf("failed to get user by email: %w", err)
+	}
+	return &user, nil
+}
+
+func (r *UserRepository) GetByHandle(ctx context.Context, handle string) (*User, error) {
+	var user User
+	err := r.db.WithContext(ctx).
+		Where("name = ?", handle).
+		Where("deleted_at is null").
+		First(&user).Error
+
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, fmt.Errorf("user not found")
+		}
+		return nil, fmt.Errorf("failed to get user by handle: %w", err)
 	}
 	return &user, nil
 }

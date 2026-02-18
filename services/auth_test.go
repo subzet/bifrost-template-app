@@ -21,7 +21,7 @@ func TestSignup(t *testing.T) {
 
 	t.Run("success returns token", func(t *testing.T) {
 		svc := newTestService(t)
-		token, err := svc.Signup(ctx, "user@example.com", "password123")
+		token, err := svc.Signup(ctx, "user@example.com", "password123", "testuser")
 		if err != nil {
 			t.Fatalf("expected no error, got %v", err)
 		}
@@ -32,10 +32,27 @@ func TestSignup(t *testing.T) {
 
 	t.Run("email taken", func(t *testing.T) {
 		svc := newTestService(t)
-		_, _ = svc.Signup(ctx, "user@example.com", "password123")
-		_, err := svc.Signup(ctx, "user@example.com", "different123")
+		_, _ = svc.Signup(ctx, "user@example.com", "password123", "user1hnd")
+		_, err := svc.Signup(ctx, "user@example.com", "different123", "user2hnd")
 		if !errors.Is(err, ErrEmailTaken) {
 			t.Errorf("expected ErrEmailTaken, got %v", err)
+		}
+	})
+
+	t.Run("handle taken", func(t *testing.T) {
+		svc := newTestService(t)
+		_, _ = svc.Signup(ctx, "user1@example.com", "password123", "testuser")
+		_, err := svc.Signup(ctx, "user2@example.com", "password123", "testuser")
+		if !errors.Is(err, ErrHandleTaken) {
+			t.Errorf("expected ErrHandleTaken, got %v", err)
+		}
+	})
+
+	t.Run("invalid handle", func(t *testing.T) {
+		svc := newTestService(t)
+		_, err := svc.Signup(ctx, "user@example.com", "password123", "ab")
+		if !errors.Is(err, ErrHandleInvalid) {
+			t.Errorf("expected ErrHandleInvalid, got %v", err)
 		}
 	})
 }
@@ -45,7 +62,7 @@ func TestLogin(t *testing.T) {
 
 	t.Run("success returns token", func(t *testing.T) {
 		svc := newTestService(t)
-		_, _ = svc.Signup(ctx, "user@example.com", "password123")
+		_, _ = svc.Signup(ctx, "user@example.com", "password123", "testuser")
 
 		token, err := svc.Login(ctx, "user@example.com", "password123")
 		if err != nil {
@@ -58,7 +75,7 @@ func TestLogin(t *testing.T) {
 
 	t.Run("wrong password", func(t *testing.T) {
 		svc := newTestService(t)
-		_, _ = svc.Signup(ctx, "user@example.com", "password123")
+		_, _ = svc.Signup(ctx, "user@example.com", "password123", "testuser")
 
 		_, err := svc.Login(ctx, "user@example.com", "wrongpassword")
 		if !errors.Is(err, ErrInvalidCredentials) {
@@ -78,7 +95,7 @@ func TestLogin(t *testing.T) {
 func TestGetUserFromRequest(t *testing.T) {
 	ctx := context.Background()
 	svc := newTestService(t)
-	token, _ := svc.Signup(ctx, "user@example.com", "password123")
+	token, _ := svc.Signup(ctx, "user@example.com", "password123", "testuser")
 
 	t.Run("valid token returns user", func(t *testing.T) {
 		req := httptest.NewRequest(http.MethodGet, "/", nil)

@@ -17,7 +17,7 @@ func newTestUser() *User {
 	return &User{
 		Email:        "test@example.com",
 		PasswordHash: "hashedpassword",
-		Name:         "Test User",
+		Name:         "testuser",
 	}
 }
 
@@ -79,19 +79,42 @@ func TestGetByEmail(t *testing.T) {
 	})
 }
 
+func TestGetByHandle(t *testing.T) {
+	repo := NewUserRepository(newTestDB(t))
+	user := newTestUser()
+	_ = repo.Create(context.Background(), user)
+
+	t.Run("found", func(t *testing.T) {
+		got, err := repo.GetByHandle(context.Background(), user.Name)
+		if err != nil {
+			t.Fatalf("GetByHandle failed: %v", err)
+		}
+		if got.ID != user.ID {
+			t.Errorf("got ID %v, want %v", got.ID, user.ID)
+		}
+	})
+
+	t.Run("not found", func(t *testing.T) {
+		_, err := repo.GetByHandle(context.Background(), "nobody")
+		if err == nil {
+			t.Error("expected error for missing handle, got nil")
+		}
+	})
+}
+
 func TestUpdate(t *testing.T) {
 	repo := NewUserRepository(newTestDB(t))
 	user := newTestUser()
 	_ = repo.Create(context.Background(), user)
 
-	user.Name = "Updated Name"
+	user.DisplayName = "Updated Name"
 	if err := repo.Update(context.Background(), user); err != nil {
 		t.Fatalf("Update failed: %v", err)
 	}
 
 	got, _ := repo.GetByID(context.Background(), user.ID.String())
-	if got.Name != "Updated Name" {
-		t.Errorf("got name %q, want %q", got.Name, "Updated Name")
+	if got.DisplayName != "Updated Name" {
+		t.Errorf("got display_name %q, want %q", got.DisplayName, "Updated Name")
 	}
 }
 

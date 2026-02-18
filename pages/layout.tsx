@@ -4,7 +4,7 @@ import { t } from "./i18n";
 import "./app.css";
 
 interface LayoutProps {
-  user?: { email: string };
+  user?: { email: string; handle: string };
   locale: string;
   t: Record<string, string>;
   children: ReactNode;
@@ -32,7 +32,7 @@ export default function Layout({ user, locale, t: translations, children }: Layo
           </form>
           {user ? (
             <>
-              <span className="text-sm text-muted-foreground">{user.email}</span>
+              <a href={`/user/${user.handle}`} className="text-sm text-muted-foreground underline-offset-4 hover:underline">@{user.handle}</a>
               <form method="POST" action="/api/logout">
                 <button
                   type="submit"

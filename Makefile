@@ -29,6 +29,7 @@ docker: docker-build docker-run
 
 ATLAS := atlas
 LOCAL_DB := sqlite://dev.db
+DEV_DB   := sqlite://file::memory:?cache=shared&_fk=1
 PROD_DB  := libsql://$$TURSO_DB_URL?authToken=$$TURSO_AUTH_TOKEN
 
 .PHONY: migrations-generate
@@ -40,7 +41,7 @@ migrations-generate:
 	atlas migrate diff $(name) \
 		--env gorm \
 		--dir file://migrations \
-		--dev-url "$(LOCAL_DB)"
+		--dev-url "$(DEV_DB)"
 
 # Default: make migrations-generate name=initial or name=add_bio_field
 # If name not set → atlas migrate diff --env gorm
