@@ -28,7 +28,7 @@ func newDatabase() *gorm.DB {
 }
 
 type Entity struct {
-	ID        uuid.UUID  `gorm:"primaryKey"`
+	ID        uuid.UUID `gorm:"primaryKey"`
 	CreatedAt time.Time
 	UpdatedAt time.Time
 	DeletedAt *time.Time `gorm:"index"`
