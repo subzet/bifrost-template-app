@@ -16,6 +16,17 @@ start: build
 doctor:
 	go run github.com/3-lines-studio/bifrost/cmd/doctor@latest .
 
+IMAGE := myapp
+
+.PHONY: docker-build docker-run docker
+docker-build:
+	docker build -t $(IMAGE) .
+
+docker-run:
+	docker run --rm -p 8080:8080 --env-file .env.$(ENV) $(IMAGE)
+
+docker: docker-build docker-run
+
 ATLAS := atlas
 LOCAL_DB := file:./data/app.db?_fk=1
 PROD_DB  := libsql://$$TURSO_DB_URL?authToken=$$TURSO_AUTH_TOKEN

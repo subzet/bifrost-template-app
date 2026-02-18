@@ -1,0 +1,12 @@
+# Built by bifrost for the host OS — must be rebuilt for Linux inside Docker
+.bifrost/
+
+# Host node_modules may contain macOS native binaries (e.g. bun-plugin-tailwind)
+node_modules/
+
+# Build artifacts and local state
+tmp/
+*.db
+
+# Environment files — passed at runtime via --env-file
+.env.*
