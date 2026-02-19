@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { ThemeToggle } from "./theme-toggle";
-import { t } from "./i18n";
+import { t } from "./lib/i18n";
+import { Button, buttonClass } from "./ui/button";
 import "./app.css";
 
 interface LayoutProps {
@@ -8,9 +9,10 @@ interface LayoutProps {
   locale: string;
   t: Record<string, string>;
   children: ReactNode;
+  hideAuthLinks?: boolean;
 }
 
-export default function Layout({ user, locale, t: translations, children }: LayoutProps) {
+export default function Layout({ user, locale, t: translations, children, hideAuthLinks }: LayoutProps) {
   return (
     <div className="min-h-screen flex flex-col">
       <nav className="container flex justify-between py-4">
@@ -23,37 +25,25 @@ export default function Layout({ user, locale, t: translations, children }: Layo
         <div className="flex items-center gap-1">
           <form method="POST" action="/api/set-lang">
             <input type="hidden" name="lang" value={locale === "es" ? "en" : "es"} />
-            <button
-              type="submit"
-              className="inline-flex items-center justify-center rounded-lg px-2 py-1.5 text-sm text-muted-foreground underline-offset-4 hover:underline"
-            >
+            <Button variant="ghost" size="sm" type="submit">
               {locale === "es" ? "EN" : "ES"}
-            </button>
+            </Button>
           </form>
           {user ? (
             <>
               <a href={`/user/${user.handle}`} className="text-sm text-muted-foreground underline-offset-4 hover:underline">@{user.handle}</a>
               <form method="POST" action="/api/logout">
-                <button
-                  type="submit"
-                  className="inline-flex items-center justify-center rounded-lg px-2 py-1.5 text-sm text-muted-foreground underline-offset-4 hover:underline"
-                >
+                <Button variant="ghost" size="sm" type="submit">
                   {t(translations, "nav.logout")}
-                </button>
+                </Button>
               </form>
             </>
-          ) : (
+          ) : !hideAuthLinks && (
             <>
-              <a
-                href="/login"
-                className="inline-flex items-center justify-center rounded-lg px-2 py-1.5 text-sm text-muted-foreground underline-offset-4 hover:underline"
-              >
+              <a href="/login" className={buttonClass("ghost", "sm")}>
                 {t(translations, "nav.login")}
               </a>
-              <a
-                href="/signup"
-                className="inline-flex items-center justify-center rounded-lg bg-primary text-primary-foreground px-2.5 py-1.5 text-sm font-medium"
-              >
+              <a href="/signup" className={buttonClass("primary", "sm")}>
                 {t(translations, "nav.signup")}
               </a>
             </>

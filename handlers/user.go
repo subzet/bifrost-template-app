@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"errors"
+	"log"
 	"net/http"
 	"net/url"
 	"strings"
@@ -75,14 +76,24 @@ func (h *UserHandler) UpdateProfile() http.HandlerFunc {
 			},
 		}
 
+		log.Print("Uploading avatar picture")
 		if file, header, err := r.FormFile("avatar"); err == nil {
+			log.Print("Upload started")
 			defer file.Close()
 			contentType := header.Header.Get("Content-Type")
 			if ext := imageExt(contentType); ext != "" {
 				key := "avatars/" + currentUser.ID.String() + ext
-				if avatarURL, err := h.store.Upload(r.Context(), key, file, header.Size, contentType); err == nil {
-					input.AvatarURL = avatarURL
+
+				avatarURL, err := h.store.Upload(r.Context(), key, file, header.Size, contentType)
+
+				if err != nil {
+					log.Printf("Error while uploading %v", err)
+					return
 				}
+
+				log.Print("Upload finished")
+				input.AvatarURL = avatarURL
+
 			}
 		}
 
@@ -97,7 +108,7 @@ func (h *UserHandler) UpdateProfile() http.HandlerFunc {
 			return
 		}
 
-		http.Redirect(w, r, "/user/"+input.Handle+"/edit?success=1", http.StatusSeeOther)
+		http.Redirect(w, r, "/user/"+input.Handle, http.StatusSeeOther)
 	}
 }
 

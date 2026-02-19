@@ -1,6 +1,6 @@
 import Layout from "./layout";
 import { ThemeScript } from "./theme-script";
-import { t } from "./i18n";
+import { t } from "./lib/i18n";
 
 interface HomeProps {
   user?: { email: string; handle: string };

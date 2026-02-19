@@ -1,20 +1,20 @@
-import { COUNTRIES } from "./countries";
+import { COUNTRIES } from "../lib/countries";
+import { Select } from "../ui/select";
 
 interface CountrySelectProps {
   name: string;
   value?: string;
-  className?: string;
 }
 
-export function CountrySelect({ name, value, className }: CountrySelectProps) {
+export function CountrySelect({ name, value }: CountrySelectProps) {
   return (
-    <select name={name} defaultValue={value ?? ""} className={className}>
+    <Select name={name} defaultValue={value ?? ""}>
       <option value="">—</option>
       {COUNTRIES.map((c) => (
         <option key={c.code} value={c.code}>
           {c.name}
         </option>
       ))}
-    </select>
+    </Select>
   );
 }

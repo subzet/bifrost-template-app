@@ -1,6 +1,11 @@
 import Layout from "./layout";
 import { ThemeScript } from "./theme-script";
-import { t } from "./i18n";
+import { t } from "./lib/i18n";
+import { Alert } from "./ui/alert";
+import { SubmitButton } from "./ui/submit-button";
+import { Card } from "./ui/card";
+import { FormField } from "./ui/form-field";
+import { Input } from "./ui/input";
 
 interface SignupProps {
   user?: { email: string; handle: string };
@@ -21,85 +26,66 @@ export function Head() {
 
 export default function Signup({ user, error, locale, t: translations }: SignupProps) {
   return (
-    <Layout user={user} locale={locale} t={translations}>
+    <Layout user={user} locale={locale} t={translations} hideAuthLinks>
       <div className="container flex justify-center py-24">
-        <div className="w-full max-w-sm rounded-xl border border-border bg-card p-6 text-card-foreground">
+        <Card className="w-full max-w-sm">
           <h2 className="text-center text-lg font-medium">
             {t(translations, "signup.title")}
           </h2>
 
           {error && (
-            <div className="mt-4 rounded-lg border border-destructive/50 bg-destructive/10 px-3 py-2 text-sm text-destructive">
-              {error}
+            <div className="mt-4">
+              <Alert variant="error">{error}</Alert>
             </div>
           )}
 
           <form method="POST" action="/api/signup" className="mt-6 space-y-4">
-            <div className="space-y-1.5">
-              <label htmlFor="handle" className="text-sm font-medium">
-                {t(translations, "signup.handle")}
-              </label>
-              <input
+            <FormField label={t(translations, "signup.handle")} htmlFor="handle">
+              <Input
                 id="handle"
                 type="text"
                 name="handle"
                 placeholder="yourhandle"
-                className="flex h-9 w-full rounded-lg border border-input bg-transparent px-2.5 py-1 text-sm placeholder:text-muted-foreground focus-visible:border-ring focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/20"
                 required
                 pattern="[a-z0-9][a-z0-9_\-]{2,29}"
               />
-            </div>
+            </FormField>
 
-            <div className="space-y-1.5">
-              <label htmlFor="email" className="text-sm font-medium">
-                {t(translations, "signup.email")}
-              </label>
-              <input
+            <FormField label={t(translations, "signup.email")} htmlFor="email">
+              <Input
                 id="email"
                 type="email"
                 name="email"
                 placeholder="you@example.com"
-                className="flex h-9 w-full rounded-lg border border-input bg-transparent px-2.5 py-1 text-sm placeholder:text-muted-foreground focus-visible:border-ring focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/20"
                 required
               />
-            </div>
+            </FormField>
 
-            <div className="space-y-1.5">
-              <label htmlFor="password" className="text-sm font-medium">
-                {t(translations, "signup.password")}
-              </label>
-              <input
+            <FormField label={t(translations, "signup.password")} htmlFor="password">
+              <Input
                 id="password"
                 type="password"
                 name="password"
                 placeholder="••••••••"
-                className="flex h-9 w-full rounded-lg border border-input bg-transparent px-2.5 py-1 text-sm placeholder:text-muted-foreground focus-visible:border-ring focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/20"
                 required
                 minLength={8}
               />
-            </div>
+            </FormField>
 
-            <div className="space-y-1.5">
-              <label htmlFor="confirm_password" className="text-sm font-medium">
-                {t(translations, "signup.confirmPassword")}
-              </label>
-              <input
+            <FormField label={t(translations, "signup.confirmPassword")} htmlFor="confirm_password">
+              <Input
                 id="confirm_password"
                 type="password"
                 name="confirm_password"
                 placeholder="••••••••"
-                className="flex h-9 w-full rounded-lg border border-input bg-transparent px-2.5 py-1 text-sm placeholder:text-muted-foreground focus-visible:border-ring focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/20"
                 required
                 minLength={8}
               />
-            </div>
+            </FormField>
 
-            <button
-              type="submit"
-              className="inline-flex h-10 w-full items-center justify-center rounded-lg bg-primary px-2.5 text-sm font-medium text-primary-foreground"
-            >
+            <SubmitButton fullWidth>
               {t(translations, "signup.submit")}
-            </button>
+            </SubmitButton>
           </form>
 
           <p className="mt-4 text-center text-sm text-muted-foreground">
@@ -108,7 +94,7 @@ export default function Signup({ user, error, locale, t: translations }: SignupP
               {t(translations, "signup.loginLink")}
             </a>
           </p>
-        </div>
+        </Card>
       </div>
     </Layout>
   );

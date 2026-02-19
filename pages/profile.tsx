@@ -1,8 +1,9 @@
 import { Facehash } from "facehash";
 import Layout from "./layout";
 import { ThemeScript } from "./theme-script";
-import { t } from "./i18n";
-import { countryName } from "./countries";
+import { t } from "./lib/i18n";
+import { countryName } from "./lib/countries";
+import { buttonClass } from "./ui/button";
 
 interface ProfileProps {
   user?: { email: string; handle: string };
@@ -67,7 +68,7 @@ export default function Profile({ user, profile, isOwner, locale, t: translation
           {isOwner && (
             <a
               href={`/user/${profile.handle}/edit`}
-              className="inline-flex items-center justify-center rounded-lg border border-border px-4 py-2 text-sm font-medium hover:bg-muted"
+              className={buttonClass("outline")}
             >
               {t(translations, "profile.editButton")}
             </a>
